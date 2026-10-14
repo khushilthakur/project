@@ -14,12 +14,10 @@ export const resumeService = {
       return data || [];
     } else {
       const cached = storage.get(STORAGE_KEYS.RESUMES);
-      if (cached && Array.isArray(cached) && cached.length > 0) {
+      if (cached && Array.isArray(cached)) {
         return cached;
       }
-      const initial = [{ ...SAMPLE_RESUME, user_id: userId }];
-      storage.set(STORAGE_KEYS.RESUMES, initial);
-      return initial;
+      return [];
     }
   },
 
@@ -34,8 +32,8 @@ export const resumeService = {
       if (error) throw error;
       return data;
     } else {
-      const list = storage.get(STORAGE_KEYS.RESUMES, [SAMPLE_RESUME]);
-      return list.find((r) => r.id === id) || list[0] || null;
+      const list = storage.get(STORAGE_KEYS.RESUMES, []);
+      return list.find((r) => r.id === id) || null;
     }
   },
 

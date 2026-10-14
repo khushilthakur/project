@@ -172,17 +172,16 @@ Location: `supabase/functions/ai-career-assistant/index.ts`
 
 ---
 
-## 7. Fast Evaluator Access (Demo Credentials)
+## 7. Fast Evaluator Access (Credentials)
 
-For reviewers and recruiters testing the application:
-- **Candidate Demo Login**:
-  - Email: `alex.rivera@example.com`
-  - Password: `CareerPilot2026!`
-  - Quick action: Click **"Sign In as Candidate"** on `/login`.
-- **Admin Demo Login**:
-  - Email: `admin@careerpilot.dev`
-  - Password: `CareerPilot2026!`
-  - Quick action: Click **"Sign In as Admin"** on `/login`.
+For testing and reviewing the application:
+- **Verified Platform Administrator**:
+  - Email: `khushilthakur28@gmail.com`
+  - Password: `280106`
+  - Quick action: Click **"Sign In as Admin (khushilthakur28@gmail.com)"** on `/login` to access the full operational telemetry, moderation queue, audit logs, and management controls.
+- **Student / Candidate Access**:
+  - Students register with their own email and password via **"Create one free"** on `/register`.
+  - All student accounts start completely clean without dummy student data, allowing authentic resume creation, job tracking, and interview coaching.
 
 ---
 

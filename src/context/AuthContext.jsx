@@ -3,32 +3,32 @@ import { supabase, isSupabaseConfigured, STORAGE_KEYS, storage } from '../lib/su
 
 const AuthContext = createContext(null);
 
-const DEFAULT_DEMO_USER = {
-  id: 'usr-demo-001',
-  email: 'alex.rivera@example.com',
+export const ADMIN_USER = {
+  id: 'usr-admin-khushil',
+  email: 'khushilthakur28@gmail.com',
   user_metadata: {
-    full_name: 'Alex Rivera',
+    full_name: 'Khushil Thakur',
   },
 };
 
-const DEFAULT_DEMO_PROFILE = {
-  id: 'usr-demo-001',
-  email: 'alex.rivera@example.com',
-  full_name: 'Alex Rivera',
+export const ADMIN_PROFILE = {
+  id: 'usr-admin-khushil',
+  email: 'khushilthakur28@gmail.com',
+  full_name: 'Khushil Thakur',
   avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-  education: 'B.S. in Computer Science, California State University',
+  education: 'System Administrator & Technical Lead',
   graduation_year: '2026',
-  experience_level: 'Fresher / Entry Level',
-  skills: ['JavaScript', 'React', 'Python', 'PostgreSQL', 'HTML5 & CSS3', 'Git', 'REST APIs'],
-  preferred_roles: ['Frontend Developer', 'Full Stack Developer', 'Software Engineer Intern'],
-  preferred_locations: ['San Francisco, CA', 'Austin, TX', 'Remote'],
+  experience_level: 'Senior (5+ yrs)',
+  skills: ['System Administration', 'Database Security', 'Full Stack Development', 'React', 'PostgreSQL', 'AI Engineering'],
+  preferred_roles: ['Platform Administrator', 'Technical Lead'],
+  preferred_locations: ['Remote', 'HQ'],
   remote_preference: 'Remote',
-  career_interests: 'Building responsive SaaS web applications, AI-assisted development tools, and performant cloud architectures.',
-  portfolio_url: 'https://alexrivera.dev',
-  github_url: 'https://github.com/alexrivera-dev',
-  linkedin_url: 'https://linkedin.com/in/alexrivera-dev',
-  role: 'user', // default user; can be toggled in demo or verified in DB
-  created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
+  career_interests: 'Platform administration, security audits, and career technology automation.',
+  portfolio_url: '',
+  github_url: '',
+  linkedin_url: '',
+  role: 'admin',
+  created_at: new Date().toISOString(),
 };
 
 export function AuthProvider({ children }) {
@@ -45,7 +45,6 @@ export function AuthProvider({ children }) {
     async function initAuth() {
       try {
         if (isSupabaseConfigured && supabase) {
-          // Live Supabase Auth
           const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
           if (sessionError) throw sessionError;
 
@@ -58,7 +57,6 @@ export function AuthProvider({ children }) {
             setProfile(null);
           }
 
-          // Listen for auth state changes
           const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
             if (!mounted) return;
             setSession(newSession);
@@ -74,9 +72,9 @@ export function AuthProvider({ children }) {
             subscription.unsubscribe();
           };
         } else {
-          // Local storage session fallback
-          const cachedUser = storage.get(STORAGE_KEYS.USER, DEFAULT_DEMO_USER);
-          const cachedProfile = storage.get(STORAGE_KEYS.PROFILE, DEFAULT_DEMO_PROFILE);
+          // Local storage session fallback: default to Admin Khushil Thakur
+          const cachedUser = storage.get(STORAGE_KEYS.USER, ADMIN_USER);
+          const cachedProfile = storage.get(STORAGE_KEYS.PROFILE, ADMIN_PROFILE);
           if (mounted) {
             setUser(cachedUser);
             setProfile(cachedProfile);
@@ -107,17 +105,17 @@ export function AuthProvider({ children }) {
         .single();
 
       if (profileErr) {
-        // If profile doesn't exist yet, insert a default one
+        const isAdminEmail = user?.email?.toLowerCase() === 'khushilthakur28@gmail.com';
         const fallbackProfile = {
           id: userId,
           email: user?.email || '',
-          full_name: user?.user_metadata?.full_name || 'Career Explorer',
-          experience_level: 'Fresher / Entry Level',
-          skills: [],
-          preferred_roles: [],
+          full_name: user?.user_metadata?.full_name || (isAdminEmail ? 'Khushil Thakur' : 'Candidate'),
+          experience_level: isAdminEmail ? 'Senior (5+ yrs)' : 'Fresher / Entry Level',
+          skills: isAdminEmail ? ADMIN_PROFILE.skills : [],
+          preferred_roles: isAdminEmail ? ADMIN_PROFILE.preferred_roles : [],
           preferred_locations: [],
           remote_preference: 'Any',
-          role: 'user',
+          role: isAdminEmail ? 'admin' : 'user',
         };
         await supabase.from('profiles').insert(fallbackProfile);
         setProfile(fallbackProfile);
@@ -129,7 +127,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Sign Up
+  // Sign Up for new students
   const signUp = async (email, password, fullName) => {
     setError(null);
     setLoading(true);
@@ -145,20 +143,40 @@ export function AuthProvider({ children }) {
         if (signUpErr) throw signUpErr;
         return { data, error: null };
       } else {
-        // Local mode registration
+        // Local mode student registration with clean empty records
+        const isTargetAdmin = email.toLowerCase() === 'khushilthakur28@gmail.com';
         const newUser = {
-          id: 'usr-' + Date.now(),
+          id: isTargetAdmin ? ADMIN_USER.id : 'usr-' + Date.now(),
           email,
           user_metadata: { full_name: fullName },
         };
         const newProfile = {
-          ...DEFAULT_DEMO_PROFILE,
           id: newUser.id,
           email,
           full_name: fullName,
+          avatar_url: '',
+          education: '',
+          graduation_year: '',
+          experience_level: 'Fresher / Entry Level',
           skills: [],
           preferred_roles: [],
+          preferred_locations: [],
+          remote_preference: 'Any',
+          career_interests: '',
+          portfolio_url: '',
+          github_url: '',
+          linkedin_url: '',
+          role: isTargetAdmin ? 'admin' : 'user',
+          created_at: new Date().toISOString(),
         };
+
+        // Clear any old student records when creating a fresh student account
+        if (!isTargetAdmin) {
+          storage.remove(STORAGE_KEYS.APPLICATIONS);
+          storage.remove(STORAGE_KEYS.RESUMES);
+          storage.remove(STORAGE_KEYS.INTERVIEWS);
+        }
+
         storage.set(STORAGE_KEYS.USER, newUser);
         storage.set(STORAGE_KEYS.PROFILE, newProfile);
         setUser(newUser);
@@ -177,26 +195,68 @@ export function AuthProvider({ children }) {
   const signIn = async (email, password) => {
     setError(null);
     setLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
+
     try {
       if (isSupabaseConfigured && supabase) {
         const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-          email,
+          email: cleanEmail,
           password,
         });
         if (signInErr) throw signInErr;
         return { data, error: null };
       } else {
-        // Local mode sign in
-        const existingProfile = storage.get(STORAGE_KEYS.PROFILE, DEFAULT_DEMO_PROFILE);
-        const loggedInUser = {
-          id: existingProfile.id || 'usr-demo-001',
-          email,
-          user_metadata: { full_name: existingProfile.full_name || email.split('@')[0] },
-        };
-        storage.set(STORAGE_KEYS.USER, loggedInUser);
-        setUser(loggedInUser);
-        setProfile({ ...existingProfile, email });
-        return { data: { user: loggedInUser }, error: null };
+        // Local mode login verification
+        if (cleanEmail === 'khushilthakur28@gmail.com') {
+          if (password !== '280106') {
+            const err = new Error('Incorrect password for administrator khushilthakur28@gmail.com.');
+            setError(err.message);
+            return { data: null, error: err };
+          }
+          storage.set(STORAGE_KEYS.USER, ADMIN_USER);
+          storage.set(STORAGE_KEYS.PROFILE, ADMIN_PROFILE);
+          setUser(ADMIN_USER);
+          setProfile(ADMIN_PROFILE);
+          return { data: { user: ADMIN_USER }, error: null };
+        } else {
+          // Student login
+          const existingUser = storage.get(STORAGE_KEYS.USER);
+          const existingProfile = storage.get(STORAGE_KEYS.PROFILE);
+
+          const studentUser = {
+            id: existingUser?.email?.toLowerCase() === cleanEmail ? existingUser.id : 'usr-' + Date.now(),
+            email: cleanEmail,
+            user_metadata: {
+              full_name: existingProfile?.email?.toLowerCase() === cleanEmail
+                ? existingProfile.full_name
+                : cleanEmail.split('@')[0],
+            },
+          };
+
+          const studentProfile = (existingProfile && existingProfile.email?.toLowerCase() === cleanEmail)
+            ? existingProfile
+            : {
+                id: studentUser.id,
+                email: cleanEmail,
+                full_name: cleanEmail.split('@')[0],
+                education: '',
+                graduation_year: '',
+                experience_level: 'Fresher / Entry Level',
+                skills: [],
+                preferred_roles: [],
+                preferred_locations: [],
+                remote_preference: 'Any',
+                career_interests: '',
+                role: 'user',
+                created_at: new Date().toISOString(),
+              };
+
+          storage.set(STORAGE_KEYS.USER, studentUser);
+          storage.set(STORAGE_KEYS.PROFILE, studentProfile);
+          setUser(studentUser);
+          setProfile(studentProfile);
+          return { data: { user: studentUser }, error: null };
+        }
       }
     } catch (err) {
       setError(err.message);
@@ -271,7 +331,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'admin' || user?.email?.toLowerCase() === 'khushilthakur28@gmail.com';
 
   return (
     <AuthContext.Provider

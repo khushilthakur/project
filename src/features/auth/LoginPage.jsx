@@ -36,10 +36,11 @@ export function LoginPage() {
     }
   };
 
-  const handleDemoSignIn = async (role = 'user') => {
+  const handleAdminSignIn = async () => {
+    setEmail('khushilthakur28@gmail.com');
+    setPassword('280106');
     setLoading(true);
-    const demoEmail = role === 'admin' ? 'admin@careerpilot.dev' : 'alex.rivera@example.com';
-    const { error } = await signIn(demoEmail, 'CareerPilot2026!');
+    const { error } = await signIn('khushilthakur28@gmail.com', '280106');
     setLoading(false);
     if (!error) {
       navigate('/app/dashboard', { replace: true });
@@ -96,40 +97,29 @@ export function LoginPage() {
           </p>
         </div>
 
-        {/* Demo Fast Login Helper for Evaluators */}
+        {/* Admin Fast Access Card */}
         <div
           style={{
             padding: '0.875rem',
             backgroundColor: 'var(--primary-light)',
-            border: '1px solid rgba(79, 70, 229, 0.2)',
+            border: '1px solid rgba(79, 70, 229, 0.25)',
             borderRadius: 'var(--radius-md)',
             marginBottom: '1.5rem',
             textAlign: 'center',
           }}
         >
           <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.5rem' }}>
-            ⚡ PORTFOLIO EVALUATOR FAST ACCESS
+            ⚡ VERIFIED ADMINISTRATOR ACCESS
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => handleDemoSignIn('user')}
-              disabled={loading}
-              style={{ fontSize: '0.75rem' }}
-            >
-              Sign In as Candidate
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleDemoSignIn('admin')}
-              disabled={loading}
-              style={{ fontSize: '0.75rem' }}
-            >
-              Sign In as Admin
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleAdminSignIn}
+            disabled={loading}
+            style={{ width: '100%', fontSize: '0.8125rem' }}
+          >
+            Sign In as Admin (khushilthakur28@gmail.com)
+          </Button>
         </div>
 
         {localError && (

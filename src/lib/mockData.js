@@ -112,95 +112,30 @@ export const INITIAL_CURATED_JOBS = [
 ];
 
 export const SAMPLE_RESUME = {
-  id: "res-sample-1",
-  title: "Software Engineer Resume",
+  id: "res-starter-1",
+  title: "Professional Resume",
   template: "modern",
   personal_info: {
-    fullName: "Alex Rivera",
-    email: "alex.rivera@example.com",
-    phone: "+1 (555) 349-2810",
-    location: "San Jose, CA",
-    linkedin: "linkedin.com/in/alexrivera-dev",
-    github: "github.com/alexrivera-dev",
-    portfolio: "alexrivera.dev",
-    summary: "Motivated Computer Science graduate with hands-on experience developing performant React web applications and RESTful APIs. Skilled in JavaScript, Python, PostgreSQL, and modern UI engineering, with an enthusiasm for clean architecture and agile product development."
+    fullName: "",
+    email: "",
+    phone: "",
+    location: "",
+    linkedin: "",
+    github: "",
+    portfolio: "",
+    summary: ""
   },
-  education: [
-    {
-      id: "edu-1",
-      institution: "California State University",
-      degree: "B.S. in Computer Science",
-      location: "San Jose, CA",
-      start_date: "2022",
-      end_date: "2026",
-      gpa: "3.85 / 4.0",
-      highlights: "Dean's Honor List, Relevant coursework: Data Structures, Web Engineering, Database Systems."
-    }
-  ],
-  experience: [
-    {
-      id: "exp-1",
-      role: "Software Engineering Intern",
-      company: "InnovateTech Solutions",
-      location: "Sunnyvale, CA",
-      start_date: "Jun 2025",
-      end_date: "Aug 2025",
-      current: false,
-      bullets: [
-        "Architected reusable React component library used across 3 client-facing SaaS products, improving code reuse by 35%.",
-        "Refactored asynchronous data fetching logic with custom hooks and query caching, reducing initial dashboard load time by 42%.",
-        "Participated in daily standups, code reviews, and automated CI test execution with Vitest."
-      ]
-    }
-  ],
-  projects: [
-    {
-      id: "proj-1",
-      title: "DevSprint - Agile Task Management App",
-      tech_stack: "React, Vite, Node.js, PostgreSQL, TailwindCSS",
-      link: "https://github.com/alexrivera-dev/devsprint",
-      description: "Full-stack Kanban productivity tool supporting drag-and-drop workflow, real-time board updates, and role-based permissions.",
-      bullets: [
-        "Implemented drag-and-drop task sorting with fluid 60fps animations.",
-        "Built secure JWT authentication and password hashing with bcrypt.",
-        "Authored comprehensive end-to-end unit tests achieving 88% code coverage."
-      ]
-    },
-    {
-      id: "proj-2",
-      title: "HealthPulse - Vital Telemetry Dashboard",
-      tech_stack: "JavaScript, Chart.js, Express, Supabase",
-      link: "https://github.com/alexrivera-dev/healthpulse",
-      description: "Real-time health monitoring analytics web application with interactive charts and exportable medical history reports.",
-      bullets: [
-        "Visualized physiological metric trends using responsive Recharts line and bar graphs.",
-        "Integrated Supabase Row Level Security to strictly isolate confidential patient records."
-      ]
-    }
-  ],
+  education: [],
+  experience: [],
+  projects: [],
   skills: {
-    technical: ["JavaScript (ES6+)", "React.js", "Python", "Node.js", "HTML5 & CSS3", "PostgreSQL", "REST APIs", "Git & GitHub"],
-    soft: ["Problem Solving", "Team Collaboration", "Agile & Scrum", "Technical Documentation", "Time Management"],
-    tools: ["Vite", "VS Code", "Figma", "Postman", "Docker basics", "GitHub Actions"],
-    languages: ["English (Native)", "Spanish (Conversational)"]
+    technical: [],
+    soft: [],
+    tools: [],
+    languages: []
   },
-  certifications: [
-    {
-      id: "cert-1",
-      name: "Meta Front-End Developer Professional Certificate",
-      issuer: "Coursera / Meta",
-      issue_date: "Nov 2025",
-      credential_url: "https://coursera.org/verify/meta-frontend"
-    }
-  ],
-  achievements: [
-    {
-      id: "ach-1",
-      title: "1st Place Winner - Silicon Valley Student Hackathon 2025",
-      description: "Led a team of 4 to design and deploy an accessibility-first educational assistant in 36 hours.",
-      date: "Oct 2025"
-    }
-  ],
+  certifications: [],
+  achievements: [],
   is_default: true,
   created_at: new Date().toISOString()
 };
@@ -365,64 +300,8 @@ export const INITIAL_ROADMAPS = [
   }
 ];
 
-export const INITIAL_APPLICATIONS = [
-  {
-    id: "app-1",
-    company: "Nexus Labs Inc.",
-    role: "Junior Frontend Developer",
-    location: "Remote",
-    job_url: "https://example.com/careers/nexus-frontend",
-    salary: "$75,000 / yr",
-    status: "Interview",
-    applied_date: "2026-03-25",
-    interview_date: new Date(Date.now() + 2 * 86400000).toISOString(),
-    follow_up_date: "2026-04-18",
-    notes: "Passed recruiter screening. Technical round scheduled with senior engineer. Review React hooks and component lifecycle.",
-    created_at: new Date(Date.now() - 14 * 86400000).toISOString()
-  },
-  {
-    id: "app-2",
-    company: "CloudScale Systems",
-    role: "Software Engineer Intern",
-    location: "Austin, TX (Hybrid)",
-    job_url: "https://example.com/careers/cloudscale-intern",
-    salary: "$42 / hr",
-    status: "Assessment",
-    applied_date: "2026-03-28",
-    interview_date: null,
-    follow_up_date: "2026-04-20",
-    notes: "Completed 60-min coding assessment on HackerRank covering arrays and hash maps. Waiting on results.",
-    created_at: new Date(Date.now() - 10 * 86400000).toISOString()
-  },
-  {
-    id: "app-3",
-    company: "FinTech Pulse",
-    role: "Associate Full Stack Engineer",
-    location: "New York, NY",
-    job_url: "https://example.com/careers/fintech-pulse-assoc",
-    salary: "$88,000 / yr",
-    status: "Applied",
-    applied_date: "2026-04-02",
-    interview_date: null,
-    follow_up_date: "2026-04-16",
-    notes: "Submitted tailored resume highlighting PostgreSQL and React dashboard projects.",
-    created_at: new Date(Date.now() - 6 * 86400000).toISOString()
-  },
-  {
-    id: "app-4",
-    company: "CognitiveWorks AI",
-    role: "AI / ML Engineering Intern",
-    location: "Seattle, WA / Remote",
-    job_url: "https://example.com/careers/cognitiveworks-ai-intern",
-    salary: "$45 / hr",
-    status: "Saved",
-    applied_date: "2026-04-05",
-    interview_date: null,
-    follow_up_date: "2026-04-15",
-    notes: "Need to polish resume bullet points focusing on Python and LLM projects before submitting.",
-    created_at: new Date(Date.now() - 3 * 86400000).toISOString()
-  }
-];
+// Student data starts clean and empty by default
+export const INITIAL_APPLICATIONS = [];
 
 export const INITIAL_NOTIFICATIONS = [
   {

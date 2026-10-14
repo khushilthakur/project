@@ -37,9 +37,9 @@ BEGIN
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
         COALESCE(NEW.raw_user_meta_data->>'avatar_url', ''),
-        'user'
+        CASE WHEN LOWER(NEW.email) = 'khushilthakur28@gmail.com' THEN 'admin' ELSE 'user' END
     )
-    ON CONFLICT (id) DO NOTHING;
+    ON CONFLICT (id) DO UPDATE SET role = CASE WHEN LOWER(EXCLUDED.email) = 'khushilthakur28@gmail.com' THEN 'admin' ELSE public.profiles.role END;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

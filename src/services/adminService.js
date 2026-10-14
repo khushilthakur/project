@@ -41,7 +41,7 @@ export const adminService = {
     const interviews = storage.get(STORAGE_KEYS.INTERVIEWS, []);
 
     return {
-      totalUsers: 142, // Simulated platform metric
+      totalUsers: 1, // Genuine user count (Administrator)
       totalJobs: jobs.length,
       totalApplications: applications.length,
       totalResumes: resumes.length,

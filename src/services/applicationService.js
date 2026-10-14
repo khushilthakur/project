@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured, STORAGE_KEYS, storage } from '../lib/supabaseClient';
-import { INITIAL_APPLICATIONS } from '../lib/mockData';
 
 export const applicationService = {
   // Get all applications for a user
@@ -15,7 +14,7 @@ export const applicationService = {
     } else {
       let list = storage.get(STORAGE_KEYS.APPLICATIONS);
       if (!list || !Array.isArray(list)) {
-        list = INITIAL_APPLICATIONS.map((app) => ({ ...app, user_id: userId }));
+        list = [];
         storage.set(STORAGE_KEYS.APPLICATIONS, list);
       }
       return list;
@@ -43,7 +42,7 @@ export const applicationService = {
       if (error) throw error;
       return data;
     } else {
-      const list = storage.get(STORAGE_KEYS.APPLICATIONS, INITIAL_APPLICATIONS);
+      const list = storage.get(STORAGE_KEYS.APPLICATIONS, []);
       const updated = [newApp, ...list];
       storage.set(STORAGE_KEYS.APPLICATIONS, updated);
 
@@ -81,7 +80,7 @@ export const applicationService = {
       if (error) throw error;
       return data;
     } else {
-      const list = storage.get(STORAGE_KEYS.APPLICATIONS, INITIAL_APPLICATIONS);
+      const list = storage.get(STORAGE_KEYS.APPLICATIONS, []);
       const index = list.findIndex((a) => a.id === id);
       if (index >= 0) {
         const oldStatus = list[index].status;
@@ -115,7 +114,7 @@ export const applicationService = {
       if (error) throw error;
       return true;
     } else {
-      const list = storage.get(STORAGE_KEYS.APPLICATIONS, INITIAL_APPLICATIONS);
+      const list = storage.get(STORAGE_KEYS.APPLICATIONS, []);
       const filtered = list.filter((a) => a.id !== id);
       storage.set(STORAGE_KEYS.APPLICATIONS, filtered);
       return true;
