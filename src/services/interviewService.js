@@ -78,15 +78,7 @@ export const interviewService = {
   },
 
   // Submit and evaluate an answer
-  async submitAnswer({ sessionId, questionId, answer, role, interviewType }) {
-    // Call AI / heuristic evaluation
-    const evaluation = await evaluateInterviewAnswer({
-      question: '',
-      answer,
-      role,
-      interview_type: interviewType,
-    });
-
+  async submitAnswer({ sessionId, questionId, answer, role, interviewType, questionText, modelAnswer, guidance }) {
     const sessions = storage.get(STORAGE_KEYS.INTERVIEWS, []);
     const sIndex = sessions.findIndex((s) => s.id === sessionId);
 
@@ -94,10 +86,28 @@ export const interviewService = {
       const session = sessions[sIndex];
       const qIndex = session.questions.findIndex((q) => q.id === questionId);
       if (qIndex >= 0) {
+        const currentQ = session.questions[qIndex];
+        const effectiveQuestion = questionText || currentQ.question_text || '';
+        const effectiveModelAnswer = modelAnswer || currentQ.default_model_answer || currentQ.model_answer || '';
+        const effectiveGuidance = guidance || currentQ.guidance || '';
+        const effectiveRole = role || session.target_role || 'Software Engineer';
+        const effectiveType = interviewType || session.interview_type || 'Technical';
+
+        // Call dynamic AI / evaluation engine
+        const evaluation = await evaluateInterviewAnswer({
+          question: effectiveQuestion,
+          answer,
+          role: effectiveRole,
+          interview_type: effectiveType,
+          model_answer: effectiveModelAnswer,
+          guidance: effectiveGuidance,
+        });
+
         session.questions[qIndex].user_answer = answer;
         session.questions[qIndex].score = evaluation.score;
         session.questions[qIndex].feedback = evaluation.feedback;
-        session.questions[qIndex].model_answer = evaluation.model_answer || session.questions[qIndex].default_model_answer;
+        // Always preserve the authentic exemplary model answer
+        session.questions[qIndex].model_answer = effectiveModelAnswer;
         session.questions[qIndex].evaluation_criteria = {
           strengths: evaluation.strengths || [],
           areas_to_improve: evaluation.areas_to_improve || [],

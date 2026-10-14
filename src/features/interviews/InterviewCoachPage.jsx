@@ -4,16 +4,10 @@ import {
   Sparkles,
   Play,
   RotateCcw,
-  CheckCircle2,
   Award,
-  ChevronRight,
-  HelpCircle,
-  Clock,
-  BookOpen,
   ArrowRight,
-  AlertCircle,
-  ThumbsUp,
-  AlertTriangle,
+  Lightbulb,
+  CheckCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../../context/AuthContext';
@@ -103,6 +97,10 @@ export function InterviewCoachPage() {
       const updatedQuestion = await interviewService.submitAnswer({
         sessionId: currentSession.id,
         questionId: question.id,
+        questionText: question.question_text || question.question,
+        modelAnswer: question.default_model_answer || question.model_answer,
+        guidance: question.guidance,
+        category: question.category,
         answer: userAnswer,
         role: currentSession.target_role,
         interviewType: currentSession.interview_type,
@@ -351,19 +349,64 @@ export function InterviewCoachPage() {
               /* Answer Feedback Card */
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1rem', borderTop: '1px solid var(--border-light)', paddingTop: '1.25rem' }}>
                 {/* Score & Summary */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div style={{ flex: 1, minWidth: '240px' }}>
                     <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       Answer Evaluation
                     </h4>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.25rem', lineHeight: 1.5 }}>
                       {questionFeedback.feedback}
                     </p>
                   </div>
-                  <Badge variant={questionFeedback.score >= 75 ? 'success' : 'warning'} style={{ fontSize: '1rem', padding: '0.4rem 0.8rem' }}>
+                  <Badge
+                    variant={questionFeedback.score >= 75 ? 'success' : questionFeedback.score >= 50 ? 'warning' : 'danger'}
+                    style={{ fontSize: '1.05rem', padding: '0.45rem 0.9rem', fontWeight: 800 }}
+                  >
                     Score: {questionFeedback.score}/100
                   </Badge>
                 </div>
+
+                {/* Key Strengths */}
+                {questionFeedback.evaluation_criteria?.strengths?.length > 0 && (
+                  <div
+                    style={{
+                      padding: '0.875rem 1rem',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--success-bg)',
+                      border: '1px solid var(--success-border)',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--success-text)', textTransform: 'uppercase', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <CheckCircle size={15} /> Key Strengths
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8125rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                      {questionFeedback.evaluation_criteria.strengths.map((str, idx) => (
+                        <li key={idx} style={{ marginBottom: '0.2rem' }}>{str}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Areas to Elevate */}
+                {questionFeedback.evaluation_criteria?.areas_to_improve?.length > 0 && (
+                  <div
+                    style={{
+                      padding: '0.875rem 1rem',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--warning-bg)',
+                      border: '1px solid var(--warning-border)',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--warning-text)', textTransform: 'uppercase', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Lightbulb size={15} /> Areas to Elevate
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8125rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                      {questionFeedback.evaluation_criteria.areas_to_improve.map((tip, idx) => (
+                        <li key={idx} style={{ marginBottom: '0.2rem' }}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {/* Model Answer */}
                 {questionFeedback.model_answer && (
@@ -378,7 +421,7 @@ export function InterviewCoachPage() {
                     <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                       ⭐ Exemplary Model Answer
                     </div>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: '0.84rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>
                       {questionFeedback.model_answer}
                     </p>
                   </div>

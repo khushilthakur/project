@@ -10,20 +10,18 @@ import {
   Trash2,
   Check,
   X,
-  FileText,
   Wand2,
-  AlertCircle,
-  Layout,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { resumeService } from '../../services/resumeService';
 import { generateProfessionalSummary, optimizeResumeBullet } from '../../services/aiService';
 import { exportResumeToPdf } from './utils/pdfExport';
 import { ResumePreview } from './ResumePreview';
-import { Input, Textarea, Select } from '../../components/common/Input';
+import { Input, Textarea } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { Card, Badge, Skeleton } from '../../components/common/Badge';
 import { SAMPLE_RESUME } from '../../lib/mockData';
+import { AiResumeFromDetailsModal } from './AiResumeFromDetailsModal';
 
 export function ResumeEditorPage() {
   const [searchParams] = useSearchParams();
@@ -40,6 +38,7 @@ export function ResumeEditorPage() {
   const [activeTab, setActiveTab] = useState('personal'); // personal, summary, experience, education, projects, skills, certs
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
   const [statusAlert, setStatusAlert] = useState(null);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   // AI Suggestion Modal / Inline state
   const [aiGeneratingSummary, setAiGeneratingSummary] = useState(false);
@@ -57,11 +56,11 @@ export function ResumeEditorPage() {
           const data = await resumeService.getResumeById(resumeId);
           if (mounted && data) setResume(data);
         } else if (isNew) {
-          // Initialize from user's profile
+          // Initialize a fresh, clean starter resume without dummy placeholder entries
           const starter = {
             id: 'res-' + Date.now(),
             user_id: user.id,
-            title: `${profile?.full_name || 'My'} Resume`,
+            title: `${profile?.full_name ? profile.full_name + ' - ' : ''}Professional Resume`,
             template: 'modern',
             personal_info: {
               fullName: profile?.full_name || '',
@@ -79,8 +78,8 @@ export function ResumeEditorPage() {
                   institution: profile.education,
                   degree: 'Bachelor Degree',
                   location: '',
-                  start_date: '2022',
-                  end_date: profile.graduation_year || '2026',
+                  start_date: '',
+                  end_date: profile.graduation_year || '',
                   gpa: '',
                   highlights: '',
                 }]
@@ -89,8 +88,8 @@ export function ResumeEditorPage() {
             projects: [],
             skills: {
               technical: profile?.skills || [],
-              soft: ['Teamwork', 'Communication', 'Problem Solving'],
-              tools: ['Git', 'VS Code'],
+              soft: [],
+              tools: [],
               languages: ['English'],
             },
             certifications: [],
@@ -209,13 +208,13 @@ export function ResumeEditorPage() {
   const addExperience = () => {
     const newExp = {
       id: 'exp-' + Date.now(),
-      role: 'Software Developer Intern',
-      company: 'Tech Corp',
-      location: 'Remote',
-      start_date: 'Jun 2025',
-      end_date: 'Aug 2025',
+      role: '',
+      company: '',
+      location: '',
+      start_date: '',
+      end_date: '',
       current: false,
-      bullets: ['Developed responsive features improving user engagement.'],
+      bullets: [''],
     };
     setResume((prev) => ({ ...prev, experience: [...prev.experience, newExp] }));
   };
@@ -229,7 +228,7 @@ export function ResumeEditorPage() {
 
   const addExperienceBullet = (expIndex) => {
     const updated = [...resume.experience];
-    updated[expIndex].bullets.push('Accomplished [X] as measured by [Y] by doing [Z].');
+    updated[expIndex].bullets.push('');
     setResume((prev) => ({ ...prev, experience: updated }));
   };
 
@@ -242,11 +241,11 @@ export function ResumeEditorPage() {
   const addProject = () => {
     const newProj = {
       id: 'proj-' + Date.now(),
-      title: 'Full-Stack Web App',
-      tech_stack: 'React, Node.js, PostgreSQL',
-      link: 'https://github.com/...',
-      description: 'Built a collaborative web application with persistent database storage.',
-      bullets: ['Implemented end-to-end authentication and responsive UI.'],
+      title: '',
+      tech_stack: '',
+      link: '',
+      description: '',
+      bullets: [''],
     };
     setResume((prev) => ({ ...prev, projects: [...prev.projects, newProj] }));
   };
@@ -261,12 +260,13 @@ export function ResumeEditorPage() {
   const addEducation = () => {
     const newEdu = {
       id: 'edu-' + Date.now(),
-      degree: 'B.S. in Computer Science',
-      institution: 'State University',
-      location: 'City, State',
-      start_date: '2022',
-      end_date: '2026',
-      gpa: '3.8',
+      degree: '',
+      institution: '',
+      location: '',
+      start_date: '',
+      end_date: '',
+      gpa: '',
+      highlights: '',
     };
     setResume((prev) => ({ ...prev, education: [...prev.education, newEdu] }));
   };
@@ -342,6 +342,15 @@ export function ResumeEditorPage() {
               <option value="tech">Tech / Terminal</option>
             </select>
           </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            icon={Sparkles}
+            onClick={() => setShowAiModal(true)}
+          >
+            ✨ AI Fill from Details
+          </Button>
 
           <Button
             variant="outline"
@@ -909,6 +918,26 @@ export function ResumeEditorPage() {
           .mobile-preview-toggle { display: none !important; }
         }
       `}</style>
+
+      {/* AI Resume Creator Modal from Details */}
+      <AiResumeFromDetailsModal
+        isOpen={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        onSuccess={(generated) => {
+          setResume(generated);
+          setStatusAlert({ type: 'success', text: 'Resume generated with AI from your details! You can now edit any section.' });
+          setTimeout(() => setStatusAlert(null), 4000);
+        }}
+        defaultValues={{
+          fullName: resume?.personal_info?.fullName || profile?.full_name || '',
+          email: resume?.personal_info?.email || profile?.email || '',
+          phone: resume?.personal_info?.phone || '',
+          location: resume?.personal_info?.location || profile?.preferred_locations?.[0] || '',
+          targetRole: profile?.preferred_roles?.[0] || 'Software Engineer',
+          skills: resume?.skills?.technical?.join(', ') || profile?.skills?.join(', ') || '',
+          template: resume?.template || 'modern',
+        }}
+      />
     </div>
   );
 }

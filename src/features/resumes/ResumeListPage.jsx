@@ -17,15 +17,17 @@ import { exportResumeToPdf } from './utils/pdfExport';
 import { Button } from '../../components/common/Button';
 import { Card, Badge, Skeleton, EmptyState } from '../../components/common/Badge';
 import { ConfirmDialog } from '../../components/common/Modal';
+import { AiResumeFromDetailsModal } from './AiResumeFromDetailsModal';
 
 export function ResumeListPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
 
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [exportingId, setExportingId] = useState(null);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -47,6 +49,10 @@ export function ResumeListPage() {
 
   const handleCreateNew = () => {
     navigate('/app/resumes/editor?new=true');
+  };
+
+  const handleAiGeneratedSuccess = (newResume) => {
+    navigate(`/app/resumes/editor?id=${newResume.id}`);
   };
 
   const handleDuplicate = async (res) => {
@@ -93,19 +99,48 @@ export function ResumeListPage() {
             Create and customize ATS-compliant resumes with AI bullet point and summary optimization.
           </p>
         </div>
-        <Button variant="primary" icon={Plus} onClick={handleCreateNew}>
-          Create New Resume
-        </Button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Button variant="secondary" icon={Plus} onClick={handleCreateNew}>
+            Create Blank Resume
+          </Button>
+          <Button variant="primary" icon={Sparkles} onClick={() => setShowAiModal(true)}>
+            ✨ Generate with AI (Simple Form)
+          </Button>
+        </div>
       </div>
 
       {resumes.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title="No resumes created yet"
-          description="Build your first ATS-friendly resume using our step-by-step editor and AI optimization tools."
-          actionLabel="Create Resume Now"
-          onAction={handleCreateNew}
-        />
+        <div className="card" style={{ textAlign: 'center', padding: '3.5rem 2rem' }}>
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--primary-light)',
+              color: 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem',
+            }}
+          >
+            <FileText size={32} />
+          </div>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+            No resumes created yet
+          </h3>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', maxWidth: '440px', margin: '0 auto 1.75rem', lineHeight: 1.5 }}>
+            Choose how you'd like to begin: fill in your details simply to let AI generate a structured resume, or start directly with a blank editor.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <Button variant="primary" icon={Sparkles} onClick={() => setShowAiModal(true)}>
+              ✨ Generate with AI (Fill Simple Form)
+            </Button>
+            <Button variant="secondary" icon={Plus} onClick={handleCreateNew}>
+              Create Blank Resume
+            </Button>
+          </div>
+        </div>
       ) : (
         <div
           style={{
@@ -182,6 +217,20 @@ export function ResumeListPage() {
         title="Delete Resume"
         message={`Are you sure you want to delete "${deleteTarget?.title}"? This cannot be undone.`}
         confirmText="Delete Resume"
+      />
+
+      {/* AI Resume Creator Modal from Details */}
+      <AiResumeFromDetailsModal
+        isOpen={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        onSuccess={handleAiGeneratedSuccess}
+        defaultValues={{
+          fullName: profile?.full_name || '',
+          email: profile?.email || '',
+          location: profile?.preferred_locations?.[0] || '',
+          targetRole: profile?.preferred_roles?.[0] || 'Software Engineer',
+          skills: profile?.skills?.join(', ') || '',
+        }}
       />
     </div>
   );

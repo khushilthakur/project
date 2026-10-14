@@ -53,7 +53,7 @@ export const resumeService = {
       if (error) throw error;
       return data;
     } else {
-      let list = storage.get(STORAGE_KEYS.RESUMES, [SAMPLE_RESUME]);
+      let list = storage.get(STORAGE_KEYS.RESUMES, []);
       const index = list.findIndex((r) => r.id === resume.id);
       if (index >= 0) {
         list[index] = updated;
@@ -86,7 +86,7 @@ export const resumeService = {
       if (error) throw error;
       return true;
     } else {
-      const list = storage.get(STORAGE_KEYS.RESUMES, [SAMPLE_RESUME]);
+      const list = storage.get(STORAGE_KEYS.RESUMES, []);
       const filtered = list.filter((r) => r.id !== id);
       storage.set(STORAGE_KEYS.RESUMES, filtered);
       return true;

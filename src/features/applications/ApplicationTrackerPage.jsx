@@ -4,26 +4,16 @@ import {
   Table as TableIcon,
   Plus,
   Search,
-  Filter,
-  Calendar,
-  Building2,
-  MapPin,
-  DollarSign,
-  Clock,
   Edit2,
   Trash2,
   ExternalLink,
   History,
-  CheckCircle2,
-  AlertTriangle,
-  MoveRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { applicationService } from '../../services/applicationService';
-import { jobService } from '../../services/jobService';
 import { Input, Textarea, Select } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Card, Badge, Skeleton, EmptyState } from '../../components/common/Badge';
+import { Card, Badge, Skeleton } from '../../components/common/Badge';
 import { Modal, ConfirmDialog } from '../../components/common/Modal';
 
 const STATUS_COLUMNS = [
@@ -52,7 +42,7 @@ export function ApplicationTrackerPage() {
   const [viewDetailsTarget, setViewDetailsTarget] = useState(null);
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     company: '',
     role: '',
     location: '',
@@ -63,7 +53,7 @@ export function ApplicationTrackerPage() {
     interview_date: '',
     follow_up_date: '',
     notes: '',
-  });
+  }));
 
   useEffect(() => {
     let mounted = true;

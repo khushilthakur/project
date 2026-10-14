@@ -38,6 +38,38 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch user profile from Supabase profiles table
+  const fetchSupabaseProfile = async (userId) => {
+    try {
+      const { data, error: profileErr } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (profileErr) {
+        const isAdminEmail = user?.email?.toLowerCase() === 'khushilthakur28@gmail.com';
+        const fallbackProfile = {
+          id: userId,
+          email: user?.email || '',
+          full_name: user?.user_metadata?.full_name || (isAdminEmail ? 'Khushil Thakur' : 'Candidate'),
+          experience_level: isAdminEmail ? 'Senior (5+ yrs)' : 'Fresher / Entry Level',
+          skills: isAdminEmail ? ADMIN_PROFILE.skills : [],
+          preferred_roles: isAdminEmail ? ADMIN_PROFILE.preferred_roles : [],
+          preferred_locations: [],
+          remote_preference: 'Any',
+          role: isAdminEmail ? 'admin' : 'user',
+        };
+        await supabase.from('profiles').insert(fallbackProfile);
+        setProfile(fallbackProfile);
+      } else {
+        setProfile(data);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch profile:', err);
+    }
+  };
+
   // Initialize Auth state
   useEffect(() => {
     let mounted = true;
@@ -94,38 +126,6 @@ export function AuthProvider({ children }) {
       mounted = false;
     };
   }, []);
-
-  // Fetch user profile from Supabase profiles table
-  const fetchSupabaseProfile = async (userId) => {
-    try {
-      const { data, error: profileErr } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (profileErr) {
-        const isAdminEmail = user?.email?.toLowerCase() === 'khushilthakur28@gmail.com';
-        const fallbackProfile = {
-          id: userId,
-          email: user?.email || '',
-          full_name: user?.user_metadata?.full_name || (isAdminEmail ? 'Khushil Thakur' : 'Candidate'),
-          experience_level: isAdminEmail ? 'Senior (5+ yrs)' : 'Fresher / Entry Level',
-          skills: isAdminEmail ? ADMIN_PROFILE.skills : [],
-          preferred_roles: isAdminEmail ? ADMIN_PROFILE.preferred_roles : [],
-          preferred_locations: [],
-          remote_preference: 'Any',
-          role: isAdminEmail ? 'admin' : 'user',
-        };
-        await supabase.from('profiles').insert(fallbackProfile);
-        setProfile(fallbackProfile);
-      } else {
-        setProfile(data);
-      }
-    } catch (err) {
-      console.warn('Failed to fetch profile:', err);
-    }
-  };
 
   // Sign Up for new students
   const signUp = async (email, password, fullName) => {

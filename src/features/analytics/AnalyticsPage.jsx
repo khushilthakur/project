@@ -21,13 +21,12 @@ import {
   HelpCircle,
   Filter,
   BarChart3,
-  CheckCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { applicationService } from '../../services/applicationService';
 import { jobService } from '../../services/jobService';
 import { interviewService } from '../../services/interviewService';
-import { Card, Badge, Skeleton } from '../../components/common/Badge';
+import { Card, Skeleton } from '../../components/common/Badge';
 
 export function AnalyticsPage() {
   const { user } = useAuth();

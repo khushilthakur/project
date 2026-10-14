@@ -8,9 +8,6 @@ import {
   BookOpen,
   ExternalLink,
   Edit2,
-  Sparkles,
-  ArrowRight,
-  TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { roadmapService } from '../../services/roadmapService';
@@ -20,7 +17,7 @@ import { Card, Badge, Skeleton, EmptyState } from '../../components/common/Badge
 import { Modal } from '../../components/common/Modal';
 
 export function LearningRoadmapsPage() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   const [roadmaps, setRoadmaps] = useState([]);
   const [activeRoadmap, setActiveRoadmap] = useState(null);
@@ -143,7 +140,6 @@ export function LearningRoadmapsPage() {
   // Calculate completed count
   const items = activeRoadmap?.items || [];
   const completedCount = items.filter((i) => i.status === 'Completed').length;
-  const inProgressCount = items.filter((i) => i.status === 'In Progress').length;
   const progressPercent = items.length > 0 ? Math.round((completedCount / items.length) * 100) : 0;
 
   if (loading) {
