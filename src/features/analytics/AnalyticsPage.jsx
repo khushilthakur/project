@@ -18,9 +18,6 @@ import {
   Award,
   Calendar,
   Briefcase,
-  HelpCircle,
-  Filter,
-  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { applicationService } from '../../services/applicationService';

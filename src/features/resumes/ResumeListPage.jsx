@@ -5,17 +5,13 @@ import {
   Plus,
   Copy,
   Trash2,
-  Download,
   Edit3,
-  CheckCircle,
-  Eye,
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { resumeService } from '../../services/resumeService';
-import { exportResumeToPdf } from './utils/pdfExport';
 import { Button } from '../../components/common/Button';
-import { Card, Badge, Skeleton, EmptyState } from '../../components/common/Badge';
+import { Card, Badge, Skeleton } from '../../components/common/Badge';
 import { ConfirmDialog } from '../../components/common/Modal';
 import { AiResumeFromDetailsModal } from './AiResumeFromDetailsModal';
 
@@ -26,7 +22,6 @@ export function ResumeListPage() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [exportingId, setExportingId] = useState(null);
   const [showAiModal, setShowAiModal] = useState(false);
 
   useEffect(() => {

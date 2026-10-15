@@ -9,15 +9,10 @@ import {
   Calendar,
   CheckCircle,
   Clock,
-  TrendingUp,
-  AlertCircle,
-  ArrowRight,
-  ExternalLink,
   Award,
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
-import { useNotifications } from '../../context/NotificationContext';
 import { applicationService } from '../../services/applicationService';
 import { jobService } from '../../services/jobService';
 import { resumeService } from '../../services/resumeService';
@@ -27,7 +22,6 @@ import { Card, Badge, Skeleton, EmptyState } from '../../components/common/Badge
 
 export function DashboardPage() {
   const { profile, user } = useAuth();
-  const { notifications } = useNotifications();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);

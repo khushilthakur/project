@@ -37,7 +37,7 @@ export function RegisterPage() {
     }
 
     setLoading(true);
-    const { data, error } = await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName);
     setLoading(false);
 
     if (error) {

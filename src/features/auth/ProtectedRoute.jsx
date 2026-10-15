@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Skeleton } from '../../components/common/Badge';
 
 export function ProtectedRoute({ children, adminOnly = false }) {
-  const { user, profile, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const location = useLocation();
 
   if (loading) {

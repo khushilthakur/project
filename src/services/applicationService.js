@@ -152,8 +152,7 @@ export const applicationService = {
       ? Math.round((offerCount / interviewCount) * 100)
       : 0;
 
-    // Follow-ups requiring action: follow_up_date <= today or within next 3 days
-    const now = new Date();
+    // Follow-ups requiring action: follow_up_date within next 3 days
     const threeDaysAhead = new Date(Date.now() + 3 * 86400000);
     const followUpsNeeded = applications.filter((app) => {
       if (!app.follow_up_date || app.status === 'Offer' || app.status === 'Rejected' || app.status === 'Withdrawn') {

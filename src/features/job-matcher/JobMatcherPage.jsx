@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
   Target,
-  Sparkles,
   CheckCircle2,
   XCircle,
   Lightbulb,
   Save,
-  Clock,
-  Briefcase,
-  FileText,
-  AlertCircle,
-  BookmarkCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { resumeService } from '../../services/resumeService';
 import { calculateJobMatch } from '../../services/aiService';
 import { supabase, isSupabaseConfigured, STORAGE_KEYS, storage } from '../../lib/supabaseClient';
-import { Textarea, Input, Select } from '../../components/common/Input';
+import { Textarea, Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Card, Badge, Skeleton } from '../../components/common/Badge';
+import { Card, Badge } from '../../components/common/Badge';
 
 export function JobMatcherPage() {
   const { user, profile } = useAuth();

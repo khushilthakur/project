@@ -9,11 +9,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  ShieldCheck,
   TrendingUp,
-  Award,
-  Layers,
-  ChevronRight,
 } from 'lucide-react';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/AppLayout';

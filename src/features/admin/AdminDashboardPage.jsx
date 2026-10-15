@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   ShieldAlert,
-  Users,
-  Briefcase,
-  FileText,
   Activity,
-  AlertTriangle,
   CheckCircle,
-  XCircle,
-  Database,
-  Cpu,
-  History,
   Lock,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { adminService } from '../../services/adminService';
-import { Card, Badge, Skeleton, EmptyState } from '../../components/common/Badge';
+import { Card, Skeleton } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 
 export function AdminDashboardPage() {

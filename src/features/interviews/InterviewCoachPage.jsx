@@ -14,7 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 import { interviewService } from '../../services/interviewService';
 import { Input, Textarea, Select } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Card, Badge, Skeleton } from '../../components/common/Badge';
+import { Card, Badge } from '../../components/common/Badge';
 
 export function InterviewCoachPage() {
   const { user, profile } = useAuth();
@@ -39,16 +39,17 @@ export function InterviewCoachPage() {
 
   // Historical Sessions
   const [pastSessions, setPastSessions] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const [sessionError, setSessionError] = useState('');
 
   useEffect(() => {
     let mounted = true;
     async function loadHistory() {
-      if (!user) return;
       try {
         setLoadingHistory(true);
-        const data = await interviewService.getSessions(user.id);
-        if (mounted) setPastSessions(data);
+        const data = await interviewService.getSessions(user?.id);
+        if (mounted) setPastSessions(data || []);
       } catch (e) {
         console.error('Error loading interview history:', e);
       } finally {
@@ -62,17 +63,21 @@ export function InterviewCoachPage() {
   // Start new interview session
   const handleStartSession = async (e) => {
     e.preventDefault();
-    if (!user) return;
+    setSessionError('');
     setStarting(true);
     try {
       const session = await interviewService.createSession({
-        targetRole,
-        interviewType,
-        difficulty,
-        jobDescription,
-        questionCount: Number(questionCount),
-        userId: user.id,
+        targetRole: targetRole || 'Software Engineer',
+        interviewType: interviewType || 'Technical',
+        difficulty: difficulty || 'Beginner',
+        jobDescription: jobDescription || '',
+        questionCount: Number(questionCount) || 3,
+        userId: user?.id,
       });
+
+      if (!session || !session.questions || session.questions.length === 0) {
+        throw new Error('Failed to generate interview questions. Please try again.');
+      }
 
       setCurrentSession(session);
       setCurrentQuestionIndex(0);
@@ -81,6 +86,7 @@ export function InterviewCoachPage() {
       setMode('session');
     } catch (err) {
       console.error('Error starting interview session:', err);
+      setSessionError(err.message || 'Unable to start interview session. Please try again.');
     } finally {
       setStarting(false);
     }
@@ -91,6 +97,7 @@ export function InterviewCoachPage() {
     e.preventDefault();
     if (!userAnswer.trim() || !currentSession) return;
     setEvaluating(true);
+    setSessionError('');
 
     const question = currentSession.questions[currentQuestionIndex];
     try {
@@ -106,9 +113,21 @@ export function InterviewCoachPage() {
         interviewType: currentSession.interview_type,
       });
 
-      setQuestionFeedback(updatedQuestion);
+      if (updatedQuestion) {
+        setQuestionFeedback(updatedQuestion);
+        setCurrentSession((prev) => {
+          if (!prev) return prev;
+          const nextQuestions = [...prev.questions];
+          nextQuestions[currentQuestionIndex] = {
+            ...nextQuestions[currentQuestionIndex],
+            ...updatedQuestion,
+          };
+          return { ...prev, questions: nextQuestions };
+        });
+      }
     } catch (err) {
       console.error('Error evaluating answer:', err);
+      setSessionError(err.message || 'Evaluation failed. Please try again.');
     } finally {
       setEvaluating(false);
     }
@@ -124,18 +143,24 @@ export function InterviewCoachPage() {
       setQuestionFeedback(null);
     } else {
       // Complete Session
-      const completed = await interviewService.completeSession(currentSession.id);
-      setCurrentSession(completed);
-      setPastSessions([completed, ...pastSessions.filter((s) => s.id !== completed.id)]);
-      setMode('summary');
+      try {
+        const completed = await interviewService.completeSession(currentSession.id);
+        const finalSession = completed || currentSession;
+        setCurrentSession(finalSession);
+        setPastSessions((prev) => [finalSession, ...prev.filter((s) => s.id !== finalSession.id)]);
+        setMode('summary');
 
-      // Trigger celebratory confetti if score is great
-      if (completed.overall_score >= 70) {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
+        // Trigger celebratory confetti if score is great
+        if (finalSession.overall_score >= 70) {
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        }
+      } catch (err) {
+        console.error('Error completing session:', err);
+        setMode('summary');
       }
     }
   };
@@ -151,6 +176,22 @@ export function InterviewCoachPage() {
           Practice technical and behavioral questions tailored to your target role with instant feedback.
         </p>
       </div>
+
+      {sessionError && (
+        <div
+          style={{
+            padding: '1rem',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--danger-bg)',
+            border: '1px solid var(--danger-border)',
+            color: 'var(--danger-text)',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+          }}
+        >
+          {sessionError}
+        </div>
+      )}
 
       {/* MODE 1: SETUP SCREEN */}
       {mode === 'setup' && (
@@ -213,7 +254,11 @@ export function InterviewCoachPage() {
 
           {/* Past Sessions History */}
           <Card title="Past Interview History" subtitle="Review past answers, scores, and feedback">
-            {pastSessions.length === 0 ? (
+            {loadingHistory ? (
+              <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <p style={{ fontSize: '0.875rem' }}>Loading session history...</p>
+              </div>
+            ) : pastSessions.length === 0 ? (
               <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                 <Mic size={36} style={{ margin: '0 auto 0.75rem', color: 'var(--primary)', opacity: 0.7 }} />
                 <p style={{ fontSize: '0.875rem', fontWeight: 600 }}>No practice sessions yet.</p>
@@ -303,9 +348,9 @@ export function InterviewCoachPage() {
               </div>
               <div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-                  {currentSession.questions[currentQuestionIndex].question_text}
+                  {currentSession.questions[currentQuestionIndex]?.question_text || currentSession.questions[currentQuestionIndex]?.question || 'Interview Question'}
                 </h3>
-                {currentSession.questions[currentQuestionIndex].guidance && (
+                {currentSession.questions[currentQuestionIndex]?.guidance && (
                   <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
                     💡 Guidance: {currentSession.questions[currentQuestionIndex].guidance}
                   </p>

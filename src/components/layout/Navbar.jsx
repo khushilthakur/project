@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Compass, Moon, Sun, Menu, X, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { Compass, Moon, Sun, Menu, X, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../common/Button';

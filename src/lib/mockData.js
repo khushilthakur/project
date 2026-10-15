@@ -160,6 +160,18 @@ export const INTERVIEW_QUESTIONS_DATABASE = {
         category: "Databases & Storage",
         guidance: "Discuss ACID guarantees, schema enforcement, joins, and relational integrity.",
         model_answer: "Relational databases like PostgreSQL organize data in structured tables with strict schemas and foreign keys, providing full ACID transactional compliance. NoSQL databases offer flexible, schemaless documents or key-value stores. PostgreSQL is the premier choice when data integrity, complex relational queries, foreign constraints, and financial/audit compliance are required."
+      },
+      {
+        question: "Explain the purpose of RESTful API principles and HTTP status codes (e.g. 200, 201, 400, 401, 404, 500).",
+        category: "API & Web Protocols",
+        guidance: "Define statelessness, standard verbs (GET, POST, PUT, DELETE), and differentiate client vs server error codes.",
+        model_answer: "REST is an architectural style based on stateless client-server communication using standard HTTP methods. Status codes provide immediate semantic clarity: 200 OK and 201 Created indicate success; 400 Bad Request, 401 Unauthorized, and 404 Not Found represent client errors; and 500 represents internal server errors."
+      },
+      {
+        question: "What are CSS Flexbox and Grid, and when should you choose one over the other?",
+        category: "CSS & Responsive Design",
+        guidance: "Explain one-dimensional (Flexbox) vs two-dimensional (Grid) layout models.",
+        model_answer: "Flexbox is designed for one-dimensional layouts along a single axis (either row or column), ideal for navbars, form input alignments, and card content distribution. CSS Grid is a two-dimensional layout system managing both rows and columns simultaneously, ideal for whole-page scaffolding and photo galleries."
       }
     ],
     Intermediate: [
@@ -180,6 +192,18 @@ export const INTERVIEW_QUESTIONS_DATABASE = {
         category: "Performance Engineering",
         guidance: "Cover code splitting (React.lazy), asset compression, lazy loading images, memoization, and caching.",
         model_answer: "Key strategies include dynamic route-based code splitting using React.lazy and Suspense to minimize initial bundle size, modern WebP/SVG image formats with lazy loading, caching API responses, tree-shaking unused dependencies, and using React.memo or useMemo only where profiling proves expensive renders."
+      },
+      {
+        question: "How does database indexing work, and what are the trade-offs between read and write operations?",
+        category: "Database Indexing",
+        guidance: "Explain B-Trees, O(log N) search complexity, index storage overhead, and write penalty on inserts/updates.",
+        model_answer: "An index is an auxiliary data structure (typically a B-Tree) that allows the database engine to find matching rows in O(log N) time rather than doing an expensive full table scan. The trade-off is write amplification: every INSERT, UPDATE, or DELETE requires updating both the base table and all corresponding index trees, increasing disk I/O and storage consumption."
+      },
+      {
+        question: "Explain Cross-Origin Resource Sharing (CORS) and how preflight OPTIONS requests protect web applications.",
+        category: "Web Security",
+        guidance: "Discuss origin definition (protocol, domain, port), server response headers (Access-Control-Allow-Origin), and preflights.",
+        model_answer: "CORS is a browser security mechanism that restricts web pages from making AJAX requests to a different domain, protocol, or port than the one serving the page. For non-simple requests (like those with custom headers or PUT/DELETE verbs), the browser automatically issues a preflight OPTIONS request to verify whether the server authorizes the cross-origin operation before dispatching the real payload."
       }
     ],
     Advanced: [
@@ -188,6 +212,30 @@ export const INTERVIEW_QUESTIONS_DATABASE = {
         category: "System Design",
         guidance: "Discuss message queues (RabbitMQ/SQS), idempotency keys, dead-letter queues, rate limits, and exponential backoff.",
         model_answer: "A resilient pipeline uses an event broker or message queue where job publishers push structured payloads containing a unique idempotency key. Worker pools consume tasks concurrently, utilizing exponential backoff retry policies for transient failures. Messages that fail repeatedly are diverted to a Dead Letter Queue (DLQ) for alerting and manual inspection, preventing message loss."
+      },
+      {
+        question: "How do you architect distributed database caching using Redis, and how do you handle cache invalidation and the 'thundering herd' problem?",
+        category: "Distributed Caching",
+        guidance: "Discuss Cache-Aside, Write-Through, TTL strategies, mutex locking, and cache stampede prevention.",
+        model_answer: "A Cache-Aside architecture checks Redis first; on a miss, the application loads from the database and populates Redis with a sensible TTL. To prevent the 'thundering herd' where thousands of concurrent requests query the database when an item expires, you can implement distributed mutex locks, probabilistic early expiration (XFetch), or background cache warmers."
+      },
+      {
+        question: "Explain the CAP theorem and describe the trade-offs between Strong Consistency and Eventual Consistency in microservices.",
+        category: "Distributed Systems",
+        guidance: "Define Consistency, Availability, and Partition Tolerance, citing concrete transactional examples like Saga vs 2PC.",
+        model_answer: "The CAP theorem states that a distributed data store can guarantee at most two out of Consistency, Availability, and Partition tolerance in the presence of network splits. In modern microservices, network partitions are inevitable, so systems usually choose AP (high availability with Eventual Consistency via event sourcing and the Saga pattern) or CP (strict consistency with two-phase commit where operations block or fail if quorum cannot be reached)."
+      },
+      {
+        question: "How would you optimize a slow database query operating on a table with 50+ million rows?",
+        category: "Database Tuning",
+        guidance: "Discuss EXPLAIN ANALYZE, composite indexes, table partitioning, avoiding SELECT *, and connection pooling.",
+        model_answer: "First, inspect the execution plan using EXPLAIN (ANALYZE, BUFFERS) to detect sequential scans and nested loops. Add targeted composite indexes covering the WHERE and ORDER BY clauses, eliminate unnecessary columns from the projection, rewrite correlated subqueries into JOINs, and if data is historical, partition the table by date range to prune scan partitions."
+      },
+      {
+        question: "How do modern frontend bundlers like Vite utilize native ES Modules (ESM) to outperform legacy Webpack setups?",
+        category: "Build Tooling & Bundlers",
+        guidance: "Explain dev server on-demand compilation, browser native ESM requests, and Rollup/esbuild usage for production.",
+        model_answer: "Legacy bundlers like Webpack bundle the entire application into memory before serving requests, which slows down as codebases scale. Vite serves source code over native browser ESM, transforming and serving only the specific files imported on the currently loaded page on-demand. Dependencies are pre-bundled using high-speed esbuild in Go, providing instant server start and lightning-fast Hot Module Replacement (HMR)."
       }
     ]
   },
@@ -204,6 +252,24 @@ export const INTERVIEW_QUESTIONS_DATABASE = {
         category: "Problem Solving (STAR)",
         guidance: "Use STAR (Situation, Task, Action, Result). State the bug, your debugging methodology, and the measurable outcome.",
         model_answer: "In my task tracker project, we noticed rapid state updates caused race conditions in task ordering. My task was to stabilize the pipeline. I utilized browser profilers and network logs to isolate the issue, implemented optimistic UI updates combined with request debouncing, and resolved the discrepancy. This eliminated user-reported errors and improved UI response time by 40%."
+      },
+      {
+        question: "How do you prioritize your tasks when you have multiple assignments or deadlines approaching simultaneously?",
+        category: "Time Management",
+        guidance: "Discuss assessing impact vs urgency, using task trackers (Kanban), and communicating early with stakeholders.",
+        model_answer: "I break down larger deliverables into discrete milestones and classify tasks by urgency and project impact using an Eisenhower matrix or Kanban board. I focus on critical blockers first, maintain transparent communication with project mentors, and provide early updates if scope adjustments are necessary."
+      },
+      {
+        question: "What is your approach to learning a new programming language, framework, or tool from scratch?",
+        category: "Continuous Learning",
+        guidance: "Explain reading official documentation, building hands-on mini-projects, and studying open-source code.",
+        model_answer: "I start by reviewing the official documentation and architectural philosophies of the tool. Next, rather than passively watching tutorials, I build a small end-to-end proof of concept to encounter real errors, inspect stack traces, and understand edge cases. Finally, I read production source code or GitHub repositories to adopt community best practices."
+      },
+      {
+        question: "Why are you interested in joining our engineering team specifically?",
+        category: "Company Alignment",
+        guidance: "Reference the company's product domain, engineering culture, and how your skills can add value.",
+        model_answer: "I admire your team's dedication to building high-performance, user-centric software. Your culture of code review, technical rigor, and developer empowerment strongly aligns with how I want to grow as an engineer. I am excited to bring my proactive attitude, strong foundational skills, and enthusiasm for problem solving to your product initiatives."
       }
     ],
     Intermediate: [
@@ -218,6 +284,56 @@ export const INTERVIEW_QUESTIONS_DATABASE = {
         category: "Career Vision",
         guidance: "Demonstrate ambition for technical depth, mentorship, code quality, and ownership.",
         model_answer: "Over the next three years, I aim to master frontend system architecture, deepen my knowledge of cloud infrastructure and database optimization, and take full ownership of feature lifecycles. In five years, I hope to mentor junior engineers, contribute to architectural roadmaps, and help drive product impact."
+      },
+      {
+        question: "Describe a scenario where you received critical or constructive feedback on your code. How did you respond?",
+        category: "Receptiveness & Growth",
+        guidance: "Show humility, focusing on code quality over personal pride, and implementing actionable improvements.",
+        model_answer: "During a pull request review, a senior engineer pointed out that my database queries were susceptible to N+1 performance bottlenecks. Rather than being defensive, I thanked them for the catch, read the recommended documentation on eager loading and joins, and refactored the logic. I also added unit tests verifying query counts, which reduced latency by 65%."
+      },
+      {
+        question: "How do you ensure maintainability and readability when writing code that others will work on?",
+        category: "Code Quality & Collaboration",
+        guidance: "Discuss clean naming conventions, modular component design, typing, and self-documenting code.",
+        model_answer: "I adhere to single-responsibility principles, write clear and descriptive variable and function names, and avoid premature abstraction. I write comprehensive docstrings and inline comments strictly where non-obvious business logic or algorithmic edge cases exist, and maintain consistent formatting with linters and automated tests."
+      },
+      {
+        question: "Tell me about a time you had to deliver a feature under a tight deadline with incomplete requirements.",
+        category: "Adaptability & Delivery",
+        guidance: "Discuss identifying minimum viable scope, clarifying ambiguities proactively, and delivering incrementally.",
+        model_answer: "When launching an analytics dashboard, client specifications for export formats were still unfinalized 48 hours before release. I proactively contacted the product owner with mockups, proposed delivering the core CSV and PDF formats first, and architected the export service modularly so additional formats could be plugged in later without refactoring. We delivered the launch on schedule with positive feedback."
+      }
+    ],
+    Advanced: [
+      {
+        question: "Describe how you approach leading a team through a high-severity production outage or critical regression.",
+        category: "Incident Management & Leadership",
+        guidance: "Cover triage, blameless communication, fast rollback/mitigation before root-cause analysis, and post-mortems.",
+        model_answer: "My priority during an incident is fast customer mitigation over finding fault. I establish a single communication channel, appoint roles for investigation and stakeholder updates, and roll back or apply feature flags to restore service immediately. Once stabilized, we conduct a blameless post-mortem with 5-Whys analysis and track action items to prevent recurrence."
+      },
+      {
+        question: "How do you balance technical debt against the business demand for rapid feature velocity?",
+        category: "Technical Governance",
+        guidance: "Discuss quantifying tech debt, translating engineering risk to business impact, and reserving sprint capacity.",
+        model_answer: "I translate technical debt into business metrics: customer latency, deploy frequency, and risk of downtime. Rather than asking for whole quarters to 'rewrite code', I advocate for dedicating a predictable 15-20% of every sprint towards refactoring and testing, and bundle architectural improvements into planned feature work."
+      },
+      {
+        question: "How do you mentor junior developers and foster an inclusive, high-performing engineering culture?",
+        category: "Mentorship & Culture",
+        guidance: "Discuss pair programming, constructive PR feedback, psychological safety, and growth paths.",
+        model_answer: "I focus on asking guiding questions rather than simply handing over solutions. In code reviews, I praise good design choices and explain the 'why' behind architectural recommendations. I encourage junior engineers to take ownership of end-to-end features, speak up in technical design discussions, and fail safely within a blameless environment."
+      },
+      {
+        question: "Tell me about an architectural decision you made that did not work out as planned. What did you learn?",
+        category: "Executive Ownership",
+        guidance: "Show self-awareness, willingness to pivot based on metrics, and institutional learning.",
+        model_answer: "We once adopted a micro-frontend architecture assuming it would allow three squads to deploy autonomously. In reality, the bundle size overhead and state synchronization complexity outweighed the team velocity benefits. After observing the metrics for two months, I led the pragmatic initiative to consolidate into a modular monorepo, which cut CI build times in half and simplified deployments."
+      },
+      {
+        question: "How do you align cross-functional stakeholders (Product, Design, Sales, Security) around complex technical roadmaps?",
+        category: "Stakeholder Alignment",
+        guidance: "Discuss speaking their business language, demonstrating ROI, visualizing roadmaps, and managing trade-offs.",
+        model_answer: "I adapt my communication to the audience: with product and sales, I highlight reliability, customer experience, and compliance velocity; with security, I provide risk matrices and threat models. By co-creating milestones and keeping trade-offs transparent, stakeholders feel heard and committed to shared engineering outcomes."
       }
     ]
   }

@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured, STORAGE_KEYS, storage } from '../lib/supabaseClient';
-import { SAMPLE_RESUME } from '../lib/mockData';
 
 export const resumeService = {
   // Get all resumes for user

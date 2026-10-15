@@ -10,6 +10,9 @@ async function callEdgeFunction(action, payload) {
     return { success: false, reason: 'AI Edge Function not configured' };
   }
 
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+
   try {
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
@@ -21,7 +24,10 @@ async function callEdgeFunction(action, payload) {
         Authorization: `Bearer ${token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify({ action, payload }),
+      signal: controller?.signal,
     });
+
+    if (timeoutId) clearTimeout(timeoutId);
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
@@ -31,6 +37,7 @@ async function callEdgeFunction(action, payload) {
     const data = await response.json();
     return { success: true, data: data.result };
   } catch (error) {
+    if (timeoutId) clearTimeout(timeoutId);
     console.warn('Edge function invocation failed, falling back:', error);
     return { success: false, error: error.message };
   }
@@ -46,7 +53,7 @@ export async function generateProfessionalSummary(candidateInfo) {
   }
 
   // Fallback intelligent summary synthesis preserving user's factual data
-  const { fullName, education, experience, skills } = candidateInfo;
+  const { experience, skills } = candidateInfo;
   const topSkills = Array.isArray(skills?.technical) && skills.technical.length > 0
     ? skills.technical.slice(0, 4).join(', ')
     : 'modern software development';
@@ -468,24 +475,48 @@ export function calculateJobMatch(jobDescription, candidateSkills = [], resumeTe
 
   const jdLower = jobDescription.toLowerCase();
 
-  // Common tech dictionary for normalization
+  // Comprehensive tech dictionary for normalization
   const TECH_SKILLS = [
     'javascript', 'typescript', 'react', 'node.js', 'python', 'sql', 'postgresql', 'mongodb',
     'docker', 'aws', 'git', 'github', 'html5', 'css3', 'tailwind', 'rest api', 'graphql',
     'next.js', 'vue', 'vitest', 'jest', 'ci/cd', 'linux', 'data structures', 'algorithms',
-    'fastapi', 'express', 'figma', 'ui/ux', 'agile', 'scrum', 'system design'
+    'fastapi', 'express', 'figma', 'ui/ux', 'agile', 'scrum', 'system design',
+    'java', 'c++', 'c#', 'c', 'golang', 'go', 'rust', 'kotlin', 'swift', 'flutter', 'dart',
+    'php', 'ruby', 'rails', 'spring', 'spring boot', 'django', 'flask', 'angular', 'svelte',
+    'react native', 'redux', 'zustand', 'bootstrap', 'sass', 'webpack', 'vite', 'redis',
+    'mysql', 'sqlite', 'oracle', 'firebase', 'supabase', 'kafka', 'rabbitmq', 'microservices',
+    'kubernetes', 'terraform', 'gcp', 'azure', 'devops', 'machine learning', 'pytorch',
+    'tensorflow', 'pandas', 'numpy', 'cypress', 'playwright', 'selenium'
   ];
-
-  // Extract skills mentioned in the job description
-  const jdRequiredSkills = TECH_SKILLS.filter((skill) => {
-    const regex = new RegExp(`\\b${skill.replace('.', '\\.')}\\b`, 'i');
-    return regex.test(jdLower);
-  });
 
   // Candidate skills pool (from skills array + resume text)
   const candidatePool = new Set(
     candidateSkills.map((s) => s.toLowerCase().trim()).filter(Boolean)
   );
+
+  // Extract skills mentioned in the job description: tech dictionary + any candidate skills in JD
+  const detectedSkillsSet = new Set();
+  TECH_SKILLS.forEach((skill) => {
+    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    if (regex.test(jdLower)) {
+      detectedSkillsSet.add(skill);
+    }
+  });
+
+  // Also include any user-specified skills if they appear in the job description
+  candidateSkills.forEach((skill) => {
+    const sClean = skill.toLowerCase().trim();
+    if (sClean && sClean.length >= 2) {
+      const escaped = sClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+      if (regex.test(jdLower)) {
+        detectedSkillsSet.add(sClean);
+      }
+    }
+  });
+
+  const jdRequiredSkills = Array.from(detectedSkillsSet);
 
   if (resumeText) {
     TECH_SKILLS.forEach((skill) => {

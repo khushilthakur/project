@@ -1,5 +1,4 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Globe, ExternalLink } from 'lucide-react';
 
 export function ResumePreview({ resume, previewId = 'resume-export-preview' }) {
   if (!resume) return null;
@@ -12,7 +11,6 @@ export function ResumePreview({ resume, previewId = 'resume-export-preview' }) {
     projects = [],
     skills = {},
     certifications = [],
-    achievements = [],
   } = resume;
 
   // Base styling for PDF container (White background, black/dark charcoal text for ATS compliance)

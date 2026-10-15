@@ -23,6 +23,24 @@ export const supabase = isSupabaseConfigured
     })
   : null;
 
+// Safe UUID v4 generator compliant with PostgreSQL UUID type
+export function generateUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+// Check if string is a valid PostgreSQL UUID
+export function isValidUUID(str) {
+  if (typeof str !== 'string') return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+}
+
 // Local storage keys for local persistent fallback mode
 export const STORAGE_KEYS = {
   USER: 'careerpilot_auth_user',
@@ -38,6 +56,7 @@ export const STORAGE_KEYS = {
   NOTIFICATIONS: 'careerpilot_notifications',
   AUDIT_LOGS: 'careerpilot_audit_logs',
   THEME: 'careerpilot_theme',
+  ACCOUNTS: 'careerpilot_registered_accounts',
 };
 
 // Safe localStorage helper

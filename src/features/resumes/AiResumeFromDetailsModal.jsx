@@ -7,13 +7,12 @@ import {
   Briefcase,
   Code2,
   Wrench,
-  CheckCircle,
   AlertCircle,
-  HelpCircle,
 } from 'lucide-react';
 import { generateResumeFromSimpleDetails } from '../../services/aiService';
 import { resumeService } from '../../services/resumeService';
-import { Input, Textarea, Select } from '../../components/common/Input';
+import { useAuth } from '../../context/AuthContext';
+import { Input, Textarea } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 
 export function AiResumeFromDetailsModal({
@@ -22,6 +21,7 @@ export function AiResumeFromDetailsModal({
   onSuccess,
   defaultValues = {},
 }) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     fullName: defaultValues.fullName || '',
     email: defaultValues.email || '',
@@ -84,8 +84,12 @@ export function AiResumeFromDetailsModal({
         template: formData.template,
       });
 
-      // Save to persistence
-      const saved = await resumeService.saveResume(generatedResume);
+      // Save to persistence with proper user ownership
+      const resumeToSave = {
+        ...generatedResume,
+        user_id: user?.id || null,
+      };
+      const saved = await resumeService.saveResume(resumeToSave);
       setLoading(false);
       onSuccess(saved);
       onClose();
